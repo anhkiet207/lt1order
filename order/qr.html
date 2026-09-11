@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tạo mã QR cho bàn — Quán LT1</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  body { padding-bottom: 40px; }
+  .wrap { max-width: 1000px; margin: 0 auto; padding: 16px; }
+  .panel { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px; margin-bottom: 18px; }
+  .panel h2 { margin: 0 0 12px; font-size: 16px; }
+  .field { margin-bottom: 12px; }
+  .field label { display: block; font-size: 13px; font-weight: 600; color: var(--muted); margin-bottom: 5px; }
+  .field input {
+    width: 100%; padding: 11px 12px; font-size: 14px; font-family: inherit;
+    border: 1px solid var(--line); border-radius: 12px; background: var(--bg); color: var(--ink);
+  }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .hint { font-size: 12.5px; color: var(--muted); line-height: 1.6; }
+  .hint code { background: var(--bg); padding: 1px 5px; border-radius: 5px; }
+
+  .qrgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 14px; }
+  .qrcard {
+    background: #fff; color: #10202b; border: 1px solid #e7ecf0; border-radius: 16px;
+    padding: 16px 12px; text-align: center; break-inside: avoid;
+  }
+  .qrcard .shop { font-size: 14px; font-weight: 800; color: #0f766e; }
+  .qrcard .tbl { font-size: 26px; font-weight: 800; margin: 2px 0 10px; }
+  .qrcard .box { display: grid; place-items: center; min-height: 170px; }
+  .qrcard .box img, .qrcard .box canvas { width: 168px; height: 168px; display: block; }
+  .qrcard .cta { font-size: 12.5px; color: #7b8a97; margin-top: 8px; line-height: 1.4; }
+  .actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+  @media print {
+    .noprint { display: none !important; }
+    body { background: #fff; padding: 0; }
+    .qrgrid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar noprint">
+  <div class="brand">
+    <div class="brand-logo">LT<span>1</span></div>
+    <div class="brand-text">
+      <strong>Tạo mã QR cho bàn</strong>
+      <span>Khách quét là ra ngay trang gọi nước</span>
+    </div>
+  </div>
+  <a class="icon-btn" href="index.html" title="Mở trang gọi nước" style="display:grid;place-items:center;text-decoration:none">🥤</a>
+</header>
+
+<div class="wrap">
+  <div class="panel noprint">
+    <h2>1. Cấu hình</h2>
+    <div class="field">
+      <label for="base">Đường dẫn trang gọi nước</label>
+      <input id="base" type="text" placeholder="https://ten-mien-cua-ban/order/index.html">
+    </div>
+    <div class="two">
+      <div class="field">
+        <label for="from">Từ bàn số</label>
+        <input id="from" type="number" value="1" min="1">
+      </div>
+      <div class="field">
+        <label for="to">Đến bàn số</label>
+        <input id="to" type="number" value="8" min="1">
+      </div>
+    </div>
+    <div class="actions">
+      <button class="btn-primary" id="gen">Tạo mã QR</button>
+      <button class="btn-ghost" id="print">🖨️ In ra giấy</button>
+    </div>
+    <p class="hint" style="margin-top:14px">
+      <b>Lưu ý:</b> điện thoại không mở được đường dẫn <code>file:///C:/...</code>. Muốn quét được thật thì trang phải nằm trên mạng:<br>
+      • Cách nhanh trong cùng WiFi: mở PowerShell tại thư mục <code>lt1</code> rồi chạy <code>python -m http.server 8000</code>, lấy IP máy bằng <code>ipconfig</code>, điền vào ô trên dạng <code>http://192.168.1.x:8000/order/index.html</code>.<br>
+      • Cách công khai: đẩy thư mục <code>order</code> lên GitHub Pages / Netlify rồi dán link https vào.
+    </p>
+  </div>
+
+  <div id="qrgrid" class="qrgrid"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+<script>
+const $ = s => document.querySelector(s);
+
+// Mặc định: lấy đường dẫn index.html cạnh file này
+(function initBase() {
+  const url = new URL('index.html', location.href).href;
+  $('#base').value = url.startsWith('file:') ? '' : url;
+  if (!$('#base').value) $('#base').placeholder = 'http://192.168.1.10:8000/order/index.html';
+})();
+
+function tableURL(base, n) {
+  const sep = base.includes('?') ? '&' : '?';
+  return base + sep + 'table=' + n;
+}
+
+function drawQR(box, text) {
+  if (window.QRCode && QRCode.CorrectLevel) {
+    // Thư viện qrcodejs: vẽ offline, không cần gửi dữ liệu đi đâu
+    new QRCode(box, { text, width: 168, height: 168, correctLevel: QRCode.CorrectLevel.M });
+  } else {
+    // Dự phòng khi không tải được thư viện
+    const img = new Image();
+    img.width = img.height = 168;
+    img.alt = text;
+    img.src = 'https://api.qrserver.com/v1/create-qr-code/?size=336x336&data=' + encodeURIComponent(text);
+    box.appendChild(img);
+  }
+}
+
+function generate() {
+  const base = $('#base').value.trim();
+  const from = Math.max(1, parseInt($('#from').value, 10) || 1);
+  const to = Math.max(from, parseInt($('#to').value, 10) || from);
+  const grid = $('#qrgrid');
+  grid.innerHTML = '';
+
+  if (!base) { alert('Hãy điền đường dẫn trang gọi nước trước nhé.'); return; }
+  if (to - from > 99) { alert('Tối đa 100 bàn một lần.'); return; }
+
+  for (let n = from; n <= to; n++) {
+    const url = tableURL(base, n);
+    const card = document.createElement('div');
+    card.className = 'qrcard';
+    card.innerHTML = `
+      <div class="shop">QUÁN NƯỚC LT1</div>
+      <div class="tbl">BÀN ${n}</div>
+      <div class="box"></div>
+      <div class="cta">Quét mã để xem menu<br>và gọi nước tại bàn</div>`;
+    grid.appendChild(card);
+    drawQR(card.querySelector('.box'), url);
+  }
+}
+
+$('#gen').addEventListener('click', generate);
+$('#print').addEventListener('click', () => window.print());
+if ($('#base').value) generate();
+</script>
+</body>
+</html>

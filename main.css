@@ -1,0 +1,35 @@
+body {
+  font-family: "Times New Roman", Times, serif;
+  font-size: 16px;
+}
+
+.canhgiua {
+  text-align: center;
+}
+
+.nhanmanh {
+  color: orange;
+  font-weight: bold;
+}
+
+a {
+  color: blue;
+}
+
+a.link-cam {
+  color: orange;
+}
+
+#para01,
+#para02 {
+  color: deeppink;
+}
+
+/* ===== Bài tập 2 ===== */
+#para02::first-letter {
+  font-size: 32px;
+}
+#para01::before {
+  content: "HUFLIT - KHOA CNTT ";
+  color: green;
+}

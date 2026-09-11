@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="Từ Khóa Tìm Kiếm" content="Web,Html,Css,JavaScript,Form" />
+    <meta name="Người Sở Hữu" content="Nguyễn Anh Kiệt , 25DH110420" />
+    <meta
+      name="Thông Tin Mô Tả"
+      content="Bài 2 Lập Trình Html - Form nhập dữ liệu"
+    />
+    <title>Bài 2 Lập trình Web Cơ bản - FORM</title>
+  </head>
+
+  <body>
+    <!-- ==================== BÀI TẬP 4: Thay đổi cấu trúc thẻ <table> ==================== -->
+    <!-- Bảng 4 cột: dùng rowspan cho ô hình đại diện, colspan để gộp ô -->
+    <h1>Bài tập 4: Thay đổi cấu trúc của thẻ &lt;table&gt;</h1>
+
+    <form action="#" method="post">
+      <h3>NHẬP THÔNG TIN SINH VIÊN</h3>
+
+      <table border="1" cellpadding="4" cellspacing="0">
+        <tr>
+          <td rowspan="3">
+            <img src="download.jpg" alt="Hình đại diện sinh viên" width="140" />
+          </td>
+          <td>HỌ VÀ TÊN:</td>
+          <td colspan="2"><input type="text" name="hoten" size="30" /></td>
+        </tr>
+        <tr>
+          <td>MÃ SỐ SINH VIÊN :</td>
+          <td colspan="2"><input type="text" name="mssv" size="30" /></td>
+        </tr>
+        <tr>
+          <td>NGÀY SINH:</td>
+          <td colspan="2"><input type="date" name="ngaysinh" /></td>
+        </tr>
+        <tr>
+          <td>CHUYÊN NGÀNH:</td>
+          <td colspan="3">
+            <label
+              ><input type="radio" name="chuyennganh" value="CNPM" />
+              CNPM</label
+            >
+            <label
+              ><input type="radio" name="chuyennganh" value="HTTT" />
+              HTTT</label
+            >
+            <label
+              ><input type="radio" name="chuyennganh" value="AN NINH MẠNG" /> AN
+              NINH MẠNG</label
+            >
+          </td>
+        </tr>
+        <tr>
+          <td>SỞ THÍCH:</td>
+          <td colspan="3">
+            <label
+              ><input
+                type="checkbox"
+                name="sothich"
+                value="VIẾT CHƯƠNG TRÌNH"
+              />
+              VIẾT CHƯƠNG TRÌNH</label
+            ><br />
+            <label
+              ><input type="checkbox" name="sothich" value="PHÂN TÍCH CSDL" />
+              PHÂN TÍCH CSDL</label
+            ><br />
+            <label
+              ><input
+                type="checkbox"
+                name="sothich"
+                value="XÂY DỰNG SƠ ĐỒ MẠNG"
+              />
+              XÂY DỰNG SƠ ĐỒ MẠNG</label
+            >
+          </td>
+        </tr>
+        <tr>
+          <td>MÀU SẮC YÊU THÍCH:</td>
+          <td><input type="color" name="mausac" /></td>
+          <td>HÌNH ĐẠI DIỆN:</td>
+          <td><input type="file" name="hinhdaidien" /></td>
+        </tr>
+        <tr>
+          <td>TÊN ĐĂNG NHẬP WEB TRƯỜNG:</td>
+          <td><input type="text" name="username" /></td>
+          <td>MẬT KHẨU ĐĂNG NHẬP WEB TRƯỜNG:</td>
+          <td><input type="password" name="password" value="123456789" /></td>
+        </tr>
+        <tr>
+          <td colspan="4">
+            <input type="submit" value="Gửi dữ liệu về máy chủ" />
+          </td>
+        </tr>
+      </table>
+    </form>
+  </body>
+</html>
