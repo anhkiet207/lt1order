@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Đơn hàng — Quán LT1</title>
+    <link rel="stylesheet" href="style.css" />
+    <style>
+      body {
+        background: #f4f6f5;
+      }
+      #loginBox {
+        max-width: 360px;
+        margin: 80px auto;
+        padding: 24px;
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      }
+      #loginBox input {
+        width: 100%;
+        padding: 10px;
+        margin: 8px 0;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+      }
+      #loginBox button {
+        width: 100%;
+        padding: 10px;
+        margin-top: 8px;
+        background: #0f766e;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+      }
+      #ordersWrap {
+        max-width: 600px;
+        margin: 20px auto;
+        padding: 0 16px;
+      }
+      .order-card {
+        background: #fff;
+        border-radius: 12px;
+        padding: 16px;
+        margin-bottom: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        border-left: 5px solid #0f766e;
+      }
+      .order-card.done {
+        opacity: 0.5;
+        border-left-color: #999;
+      }
+      .order-card h3 {
+        margin: 0 0 6px;
+      }
+      .order-card ul {
+        margin: 8px 0;
+        padding-left: 20px;
+      }
+      .order-card .actions {
+        margin-top: 10px;
+      }
+      .order-card button {
+        padding: 6px 12px;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+        margin-right: 8px;
+      }
+      .btn-done {
+        background: #0f766e;
+        color: #fff;
+      }
+      .btn-logout {
+        position: fixed;
+        top: 12px;
+        right: 12px;
+        padding: 8px 14px;
+        background: #333;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+      }
+      .hidden {
+        display: none !important;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="loginBox">
+      <h2>Đăng nhập chủ quán</h2>
+      <input type="email" id="email" placeholder="Email" />
+      <input type="password" id="password" placeholder="Mật khẩu" />
+      <button id="loginBtn">Đăng nhập</button>
+      <p id="loginError" style="color: red"></p>
+    </div>
+
+    <button class="btn-logout hidden" id="logoutBtn">Đăng xuất</button>
+    <h1 id="pageTitle" class="hidden" style="text-align: center">
+      📋 Đơn hàng — Quán LT1
+    </h1>
+    <div id="ordersWrap" class="hidden"></div>
+
+    <audio
+      id="dingSound"
+      src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg"
+      preload="auto"
+    ></audio>
+
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+    <script>
+      const firebaseConfig = {
+        apiKey: "AIzaSyBuutEycLA3a3U41Xal7v70_vmIw9zMDkU",
+        authDomain: "lt1-order.firebaseapp.com",
+        projectId: "lt1-order",
+        storageBucket: "lt1-order.firebasestorage.app",
+        messagingSenderId: "597867735672",
+        appId: "1:597867735672:web:f2f17facbcc5aac2349b8d",
+      };
+      firebase.initializeApp(firebaseConfig);
+      const auth = firebase.auth();
+      const db = firebase.firestore();
+
+      let knownOrderIds = new Set();
+      let firstLoad = true;
+
+      // Đăng nhập
+      document.getElementById("loginBtn").addEventListener("click", () => {
+        const email = document.getElementById("email").value.trim();
+        const pass = document.getElementById("password").value;
+        auth.signInWithEmailAndPassword(email, pass).catch((err) => {
+          document.getElementById("loginError").textContent =
+            "Sai email hoặc mật khẩu!";
+        });
+      });
+
+      // Đăng xuất
+      document
+        .getElementById("logoutBtn")
+        .addEventListener("click", () => auth.signOut());
+
+      // Theo dõi trạng thái đăng nhập
+      auth.onAuthStateChanged((user) => {
+        if (user) {
+          document.getElementById("loginBox").classList.add("hidden");
+          document.getElementById("logoutBtn").classList.remove("hidden");
+          document.getElementById("pageTitle").classList.remove("hidden");
+          document.getElementById("ordersWrap").classList.remove("hidden");
+          listenOrders();
+        } else {
+          document.getElementById("loginBox").classList.remove("hidden");
+          document.getElementById("logoutBtn").classList.add("hidden");
+          document.getElementById("pageTitle").classList.add("hidden");
+          document.getElementById("ordersWrap").classList.add("hidden");
+        }
+      });
+
+      function listenOrders() {
+        db.collection("orders")
+          .orderBy("createdAt", "desc")
+          .limit(50)
+          .onSnapshot((snapshot) => {
+            const wrap = document.getElementById("ordersWrap");
+            wrap.innerHTML = "";
+
+            snapshot.forEach((doc) => {
+              const o = doc.data();
+              const id = doc.id;
+
+              // Báo chuông nếu là đơn mới xuất hiện (không phải lần load đầu)
+              if (!firstLoad && !knownOrderIds.has(id)) {
+                document
+                  .getElementById("dingSound")
+                  .play()
+                  .catch(() => {});
+              }
+              knownOrderIds.add(id);
+
+              const card = document.createElement("div");
+              card.className =
+                "order-card" + (o.status === "done" ? " done" : "");
+              card.innerHTML = `
+            <h3>${o.code || ""} ${o.table ? "— Bàn " + o.table : ""}</h3>
+            <div>${o.time || ""}</div>
+            <ul>${(o.items || []).map((i) => `<li>${i.name} × ${i.qty}</li>`).join("")}</ul>
+            <b>Tổng: ${(o.total || 0).toLocaleString("vi-VN")} đ</b>
+            ${o.note ? `<div>Ghi chú: ${o.note}</div>` : ""}
+            <div class="actions">
+              ${o.status !== "done" ? `<button class="btn-done" data-id="${id}">Đã xong</button>` : "<i>Đã hoàn thành</i>"}
+            </div>
+          `;
+              wrap.appendChild(card);
+            });
+
+            firstLoad = false;
+          });
+      }
+
+      document.addEventListener("click", (e) => {
+        const btn = e.target.closest(".btn-done");
+        if (btn) {
+          db.collection("orders")
+            .doc(btn.dataset.id)
+            .update({ status: "done" });
+        }
+      });
+    </script>
+  </body>
+</html>
