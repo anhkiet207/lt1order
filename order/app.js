@@ -465,6 +465,14 @@ function placeOrder() {
     }),
   };
 
+  db.collection("orders")
+    .add({
+      ...order,
+      status: "new",
+      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+    })
+    .catch((err) => console.error("Lỗi gửi đơn:", err));
+
   const hist = loadJSON(HIST_KEY, []);
   hist.unshift(order);
   saveJSON(HIST_KEY, hist.slice(0, 20));
