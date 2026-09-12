@@ -1,94 +1,128 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="vi">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="theme-color" content="#0f766e">
-<title>Gọi nước — Quán LT1</title>
-<link rel="stylesheet" href="style.css">
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <meta name="theme-color" content="#0f766e" />
+    <title>Gọi nước — Quán LT1</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-logo">LT<span>1</span></div>
+        <div class="brand-text">
+          <strong>Quán Nước LT1</strong>
+          <span id="tableLabel">Gọi nước tại bàn</span>
+        </div>
+      </div>
+      <button class="icon-btn" id="historyBtn" title="Đơn đã gọi">🧾</button>
+    </header>
 
-<header class="topbar">
-  <div class="brand">
-    <div class="brand-logo">LT<span>1</span></div>
-    <div class="brand-text">
-      <strong>Quán Nước LT1</strong>
-      <span id="tableLabel">Gọi nước tại bàn</span>
+    <div class="searchwrap">
+      <span class="search-ico">🔍</span>
+      <input
+        id="search"
+        type="search"
+        placeholder="Tìm nước... (sting, coca, trà...)"
+        autocomplete="off"
+      />
     </div>
-  </div>
-  <button class="icon-btn" id="historyBtn" title="Đơn đã gọi">🧾</button>
-</header>
 
-<div class="searchwrap">
-  <span class="search-ico">🔍</span>
-  <input id="search" type="search" placeholder="Tìm nước... (sting, coca, trà...)" autocomplete="off">
-</div>
+    <nav class="tabs" id="tabs"></nav>
 
-<nav class="tabs" id="tabs"></nav>
+    <main>
+      <div id="grid" class="grid"></div>
+      <p id="empty" class="empty hidden">Không tìm thấy món nào 🥲</p>
+    </main>
 
-<main>
-  <div id="grid" class="grid"></div>
-  <p id="empty" class="empty hidden">Không tìm thấy món nào 🥲</p>
-</main>
-
-<!-- Thanh giỏ hàng -->
-<div class="cartbar hidden" id="cartbar">
-  <div class="cartbar-info">
-    <span class="cartbar-count" id="cartCount">0</span>
-    <div>
-      <strong id="cartTotal">0 đ</strong>
-      <small id="cartItems">0 món</small>
+    <!-- Thanh giỏ hàng -->
+    <div class="cartbar hidden" id="cartbar">
+      <div class="cartbar-info">
+        <span class="cartbar-count" id="cartCount">0</span>
+        <div>
+          <strong id="cartTotal">0 đ</strong>
+          <small id="cartItems">0 món</small>
+        </div>
+      </div>
+      <button class="btn-primary" id="viewCart">Xem giỏ →</button>
     </div>
-  </div>
-  <button class="btn-primary" id="viewCart">Xem giỏ →</button>
-</div>
 
-<!-- Sheet giỏ hàng -->
-<div class="overlay hidden" id="overlay"></div>
-<section class="sheet hidden" id="sheet" aria-label="Giỏ hàng">
-  <div class="sheet-head">
-    <h2>Giỏ hàng của bạn</h2>
-    <button class="icon-btn" id="closeSheet">✕</button>
-  </div>
-  <div class="sheet-body">
-    <ul class="cartlist" id="cartlist"></ul>
-    <label class="note-label">Ghi chú cho quán
-      <textarea id="note" rows="2" placeholder="VD: ít đá, lấy ống hút, mang ra sau 5 phút..."></textarea>
-    </label>
-    <div class="sumrow"><span>Tạm tính</span><b id="sumSub">0 đ</b></div>
-    <div class="sumrow total"><span>Tổng cộng</span><b id="sumTotal">0 đ</b></div>
-  </div>
-  <div class="sheet-foot">
-    <button class="btn-ghost" id="clearCart">Xoá hết</button>
-    <button class="btn-primary big" id="placeOrder">Gửi đơn cho quán</button>
-  </div>
-</section>
+    <!-- Sheet giỏ hàng -->
+    <div class="overlay hidden" id="overlay"></div>
+    <section class="sheet hidden" id="sheet" aria-label="Giỏ hàng">
+      <div class="sheet-head">
+        <h2>Giỏ hàng của bạn</h2>
+        <button class="icon-btn" id="closeSheet">✕</button>
+      </div>
+      <div class="sheet-body">
+        <ul class="cartlist" id="cartlist"></ul>
+        <label class="note-label"
+          >Ghi chú cho quán
+          <textarea
+            id="note"
+            rows="2"
+            placeholder="VD: ít đá, lấy ống hút, mang ra sau 5 phút..."
+          ></textarea>
+        </label>
+        <div class="sumrow"><span>Tạm tính</span><b id="sumSub">0 đ</b></div>
+        <div class="sumrow total">
+          <span>Tổng cộng</span><b id="sumTotal">0 đ</b>
+        </div>
+      </div>
+      <div class="sheet-foot">
+        <button class="btn-ghost" id="clearCart">Xoá hết</button>
+        <button class="btn-primary big" id="placeOrder">
+          Gửi đơn cho quán
+        </button>
+      </div>
+    </section>
 
-<!-- Thành công -->
-<section class="modal hidden" id="doneModal">
-  <div class="modal-card">
-    <div class="check">✓</div>
-    <h2>Đã gửi đơn!</h2>
-    <p>Mã đơn <b id="orderCode">#000</b><br><span id="orderMeta"></span></p>
-    <p class="muted">Quán đang chuẩn bị nước cho bạn, vui lòng đợi một chút nhé.</p>
-    <button class="btn-primary big" id="doneOk">Gọi thêm</button>
-  </div>
-</section>
+    <!-- Thành công -->
+    <section class="modal hidden" id="doneModal">
+      <div class="modal-card">
+        <div class="check">✓</div>
+        <h2>Đã gửi đơn!</h2>
+        <p>
+          Mã đơn <b id="orderCode">#000</b><br /><span id="orderMeta"></span>
+        </p>
+        <p class="muted">
+          Quán đang chuẩn bị nước cho bạn, vui lòng đợi một chút nhé.
+        </p>
+        <button class="btn-primary big" id="doneOk">Gọi thêm</button>
+      </div>
+    </section>
 
-<!-- Lịch sử -->
-<section class="modal hidden" id="histModal">
-  <div class="modal-card left">
-    <h2>Đơn đã gọi</h2>
-    <div id="histBody"></div>
-    <button class="btn-ghost" id="histClose">Đóng</button>
-  </div>
-</section>
+    <!-- Lịch sử -->
+    <section class="modal hidden" id="histModal">
+      <div class="modal-card left">
+        <h2>Đơn đã gọi</h2>
+        <div id="histBody"></div>
+        <button class="btn-ghost" id="histClose">Đóng</button>
+      </div>
+    </section>
 
-<footer class="foot">
-  Quét mã QR trên bàn để gọi nước • <a href="qr.html">Tạo mã QR cho bàn</a>
-</footer>
-
-<script src="app.js"></script>
-</body>
+    <footer class="foot">
+      Quét mã QR trên bàn để gọi nước • <a href="qr.html">Tạo mã QR cho bàn</a>
+    </footer>
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+    <script>
+      const firebaseConfig = {
+        apiKey: "AIzaSyBuutEycLA3a3U41Xal7v70_vmIw9zMDkU",
+        authDomain: "lt1-order.firebaseapp.com",
+        projectId: "lt1-order",
+        storageBucket: "lt1-order.firebasestorage.app",
+        messagingSenderId: "597867735672",
+        appId: "1:597867735672:web:f2f17facbcc5aac2349b8d",
+      };
+      firebase.initializeApp(firebaseConfig);
+      const db = firebase.firestore();
+    </script>
+    <script src="app.js"></script>
+  </body>
 </html>
