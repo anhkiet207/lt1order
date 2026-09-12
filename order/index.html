@@ -111,16 +111,12 @@
     </section>
 
     <footer class="foot">
-      Quét mã QR trên bàn để gọi nước
-      <span id="ownerLink" class="hidden"
-        >• <a href="qr.html">Tạo mã QR cho bàn</a></span
-      >
+      Quét mã QR trên bàn để gọi nước • <a href="qr.html">Tạo mã QR cho bàn</a>
     </footer>
 
     <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
     <script>
       const firebaseConfig = {
         apiKey: "AIzaSyBuutEycLA3a3U41Xal7v70_vmIw9zMDkU",
@@ -132,14 +128,6 @@
       };
       firebase.initializeApp(firebaseConfig);
       const db = firebase.firestore();
-
-      firebase.auth().onAuthStateChanged((user) => {
-        const el = document.getElementById("ownerLink");
-        if (el) {
-          if (user) el.classList.remove("hidden");
-          else el.classList.add("hidden");
-        }
-      });
     </script>
 
     <script src="app.js"></script>
