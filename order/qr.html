@@ -196,6 +196,8 @@
           title="Mở trang gọi nước"
           style="display: grid; place-items: center; text-decoration: none"
           >🥤</a
+          <a class="icon-btn" href="index.html" title="Mở trang gọi nước" style="display:grid;place-items:center;text-decoration:none">🥤</a>
+<button id="qrLogoutBtn" class="icon-btn" title="Đăng xuất" style="cursor:pointer">🚪</button>
         >
       </header>
 
@@ -330,7 +332,7 @@
       };
       firebase.initializeApp(firebaseConfig);
       const auth = firebase.auth();
-
+$('#qrLogoutBtn').addEventListener('click', () => auth.signOut());
       $("#qrLoginBtn").addEventListener("click", () => {
         const email = $("#qrEmail").value.trim();
         const pass = $("#qrPassword").value;
